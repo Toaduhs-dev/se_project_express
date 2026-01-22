@@ -1,6 +1,10 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const mainRouter = require("./routes/index");
+const { createUser, loginUser } = require("./controllers/users");
+const cors = require("cors");
+
+app.use(cors());
 
 const app = express();
 
@@ -14,6 +18,9 @@ mongoose
   .catch((e) => console.error(e));
 
 app.use("/", mainRouter);
+
+app.post("/signin", loginUser);
+app.post("/signup", createUser);
 
 app.listen(PORT, () => {
   console.log(`Listening on port ${PORT}`);

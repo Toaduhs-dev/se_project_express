@@ -76,8 +76,6 @@ const updateLike = (req, res, method) => {
   const {
     params: { id },
   } = req;
-  // const method === req.method === 'PUT' ? '$addToSet' : '$pull'
-  // When updating a user or items, `new: true` is passed to options.
   ClothingItem.findByIdAndUpdate(
     id,
     { [method]: { likes: req.user._id } },
@@ -93,15 +91,11 @@ const updateLike = (req, res, method) => {
     })
     .catch((err) => {
       console.error(err);
-      // 400 — invalid data passed to the methods for creating an item/user or
-      // updating a user's profile or avatar
+
       if (err.name === "CastError") {
         res.status(BAD_REQUEST_ERROR_CODE).send({ message: "Invalid item ID" });
-        // 404 — there is no user or card with the requested id or
-        // the request is sent to a non-existent address
       } else if (err.statusCode === NOT_FOUND_ERROR_CODE) {
         res.status(NOT_FOUND_ERROR_CODE).send({ message: err.message });
-        // 500 — default error. Accompanied by the message: "An error has occurred on the server";
       } else {
         res
           .status(INTERNAL_SERVER_ERROR_CODE)
