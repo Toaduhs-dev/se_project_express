@@ -4,6 +4,7 @@ const {
   BAD_REQUEST_ERROR_CODE,
   NOT_FOUND_ERROR_CODE,
   INTERNAL_SERVER_ERROR_CODE,
+  FORBIDDEN_ERROR_CODE,
 } = require("../utils/errors");
 
 // GET /items
@@ -52,11 +53,20 @@ const deleteClothingItem = (req, res) => {
   const { id } = req.params;
   ClothingItem.findById(id)
     .orFail(() => {
-      const error = new Error("Card ID not found");
+      const error = new Error("Item ID not found");
       error.statusCode = NOT_FOUND_ERROR_CODE;
       throw error;
     })
-    .then((item) => ClothingItem.deleteOne(item).then(() => res.send(item)))
+    .then((item) => {
+      if (!item.owner.equals(req.user._id)) {
+        const err = new Error("You are not authorized to delete this item");
+        err.statusCode = 403;
+        throw err;
+      }
+      return ClothingItem.deleteOne({ _id: id }).then(() =>
+        res.send({ message: "Item deleted successfully" })
+      );
+    })
     .catch((err) => {
       console.error(err);
 
@@ -64,6 +74,10 @@ const deleteClothingItem = (req, res) => {
         res.status(BAD_REQUEST_ERROR_CODE).send({ message: "Invalid item ID" });
       } else if (err.statusCode === NOT_FOUND_ERROR_CODE) {
         res.status(NOT_FOUND_ERROR_CODE).send({ message: err.message });
+      } else if (err.statusCode === 403) {
+        res.status(403).send({ message: err.message });
+      } else if (err.statusCode === FORBIDDEN_ERROR_CODE) {
+        res.status(FORBIDDEN_ERROR_CODE).send({ message: err.message });
       } else {
         res
           .status(INTERNAL_SERVER_ERROR_CODE)

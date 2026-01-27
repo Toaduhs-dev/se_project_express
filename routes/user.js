@@ -3,20 +3,19 @@ const auth = require("../middlewares/auth");
 
 const {
   getUsers,
-  getCurrentUsers,
+  getCurrentUser,
   updateProfile,
   createUser,
   loginUser,
 } = require("../controllers/users");
 
+router.post("/signup", createUser);
+router.post("/signin", loginUser);
+
 router.get("/users", getUsers);
 
-router.get("/users/me", auth, getCurrentUsers);
+router.get("/users/me", auth, getCurrentUser);
 
-router.get("/users", auth, updateProfile);
-
-router.get("/users", createUser);
-
-router.get("/users", loginUser);
+router.patch("/users/me", auth, updateProfile);
 
 module.exports = router;

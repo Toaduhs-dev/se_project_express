@@ -1,4 +1,5 @@
 const { response } = require("express");
+const bcrypt = require("bcrypt");
 const User = require("../models/user");
 const { JWT_SECRET } = require("../utils/config");
 
@@ -20,36 +21,31 @@ const getUsers = (req, res) => {
 };
 
 const getCurrentUser = (req, res) => {
-  const { id } = req.params;
-  User.findById(id)
+  User.findById(req.user._id)
     .orFail(() => {
-      const error = new Error("User ID not found");
-      error.statusCode = NOT_FOUND_ERROR_CODE;
-      throw error;
+      const err = new Error("User not found");
+      err.statusCode = 404;
+      throw err;
     })
     .then((user) => res.send(user))
     .catch((err) => {
       console.error(err);
-
-      if (err.name === "CastError") {
-        res.status(BAD_REQUEST_ERROR_CODE).send({ message: "Invalid user ID" });
-      } else if (err.statusCode === NOT_FOUND_ERROR_CODE) {
-        res.status(NOT_FOUND_ERROR_CODE).send({ message: err.message });
-      } else {
-        res
-          .status(INTERNAL_SERVER_ERROR_CODE)
-          .send({ message: "An error has occurred on the server" });
+      if (err.name === "CastError" || err.statusCode === 404) {
+        return res.status(404).send({ message: "User not found" });
       }
+      return res
+        .status(500)
+        .send({ message: "An error has occurred on the server" });
     });
 };
 
 const createUser = (req, res) => {
   const { name, avatar, email, password } = req.body;
+
   if (!email || !password) {
-    return res.status(BAD_REQUEST_ERROR_CODE).send({
-      message: "Email and password are required",
-    });
+    return res.status(400).send({ message: "Email and password are required" });
   }
+
   bcrypt
     .hash(password, 10)
     .then((hash) =>
@@ -69,27 +65,24 @@ const createUser = (req, res) => {
         name: user.name,
         avatar: user.avatar,
         email: user.email,
-        createdAt: user.createdAt,
         token,
       });
-      delete response.password;
-      res.status(201).send(response);
     })
     .catch((err) => {
       console.error(err);
       if (err.name === "ValidationError") {
         const messages = Object.values(err.errors)
-          .map((error) => error.message)
+          .map((e) => e.message)
           .join(", ");
-        return res.status(BAD_REQUEST_ERROR_CODE).send({ message: messages });
+        return res.status(400).send({ message: messages });
       }
       if (err.code === 11000) {
-        return res.status(CONFLICT_ERROR_CODE || 409).send({
-          message: "A user with this email already exists",
-        });
+        return res
+          .status(409)
+          .send({ message: "A user with this email already exists" });
       }
       return res
-        .status(INTERNAL_SERVER_ERROR_CODE)
+        .status(500)
         .send({ message: "An error has occurred on the server" });
     });
 };
