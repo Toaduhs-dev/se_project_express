@@ -1,5 +1,5 @@
 const { response } = require("express");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const User = require("../models/user");
 const { JWT_SECRET } = require("../utils/config");
 
@@ -54,7 +54,7 @@ const createUser = (req, res) => {
         avatar,
         email: email.toLowerCase().trim(),
         password: hash,
-      })
+      }),
     )
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
