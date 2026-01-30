@@ -9,13 +9,10 @@ const {
   loginUser,
 } = require("../controllers/users");
 
-router.post("/signup", createUser);
-router.post("/signin", loginUser);
+router.get("/", getUsers);
 
-router.get("/users", getUsers);
+router.get("/me", auth, getCurrentUser);
 
-router.get("/users/me", auth, getCurrentUser);
-
-router.patch("/users/me", auth, updateProfile);
+router.patch("/me", auth, updateProfile);
 
 module.exports = router;
