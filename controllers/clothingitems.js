@@ -21,6 +21,7 @@ const getClothingItems = (req, res) => {
 
 // POST /items
 const createClothingItem = (req, res) => {
+  console.log(req.user);
   const owner = req.user._id;
   const { name, imageUrl, weather } = req.body;
   ClothingItem.create({
@@ -32,8 +33,6 @@ const createClothingItem = (req, res) => {
     .then((item) => res.status(201).send(item))
     .catch((err) => {
       console.error(err);
-      // 400 — invalid data passed to the methods for creating a card/user or
-      // updating a user's profile or avatar
       if (err.name === "ValidationError") {
         res.status(BAD_REQUEST_ERROR_CODE).send({
           message: `${Object.values(err.errors)

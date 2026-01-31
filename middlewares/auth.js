@@ -1,6 +1,8 @@
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = require("../utils/config");
 const { UNAUTHORIZED_ERROR_CODE } = require("../utils/errors");
+const bcrypt = require("bcryptjs");
+const User = require("../models/user");
 
 const auth = (req, res, next) => {
   // const token = req.cookies.jwt;
@@ -29,20 +31,16 @@ const auth = (req, res, next) => {
   return next();
 };
 
-
-const bcrypt = require('bcryptjs');
-const User = require('../models/user');
-
 // User Registration
 const signup = async (req, res, next) => {
   try {
     const { name, avatar, email, password } = req.body;
     if (!name || !avatar || !email || !password) {
-      return res.status(400).send({ message: 'All fields are required' });
+      return res.status(400).send({ message: "All fields are required" });
     }
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(409).send({ message: 'User already exists' });
+      return res.status(409).send({ message: "User already exists" });
     }
     const hash = await bcrypt.hash(password, 10);
     const user = await User.create({ name, avatar, email, password: hash });
@@ -62,17 +60,19 @@ const signin = async (req, res, next) => {
   try {
     const { email, password } = req.body;
     if (!email || !password) {
-      return res.status(400).send({ message: 'Email and password are required' });
+      return res
+        .status(400)
+        .send({ message: "Email and password are required" });
     }
-    const user = await User.findOne({ email }).select('+password');
+    const user = await User.findOne({ email }).select("+password");
     if (!user) {
-      return res.status(401).send({ message: 'Incorrect email or password' });
+      return res.status(401).send({ message: "Incorrect email or password" });
     }
     const matched = await bcrypt.compare(password, user.password);
     if (!matched) {
-      return res.status(401).send({ message: 'Incorrect email or password' });
+      return res.status(401).send({ message: "Incorrect email or password" });
     }
-    const token = jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: '7d' });
+    const token = jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: "7d" });
     res.send({ token });
   } catch (err) {
     next(err);

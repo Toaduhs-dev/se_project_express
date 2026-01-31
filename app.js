@@ -20,19 +20,6 @@ mongoose
     console.error("DB connection error:", e);
   });
 
-const authMiddleware = (req, res, next) => {
-  // Example: decoded token or fetched user
-  const user = {
-    _id: "64f9c2e1a3b4c5d6e7f8a9b0",
-    name: "John Doe",
-  };
-
-  req.user = user;
-  next();
-};
-
-app.use(authMiddleware);
-
 app.use("/", mainRouter);
 
 app.use((req, res) => {

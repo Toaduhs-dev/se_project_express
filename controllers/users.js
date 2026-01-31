@@ -2,6 +2,7 @@ const { response } = require("express");
 const bcrypt = require("bcryptjs");
 const User = require("../models/user");
 const { JWT_SECRET } = require("../utils/config");
+const jwt = require("jsonwebtoken");
 
 const {
   BAD_REQUEST_ERROR_CODE,
@@ -54,7 +55,7 @@ const createUser = (req, res) => {
         avatar,
         email: email.toLowerCase().trim(),
         password: hash,
-      }),
+      })
     )
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
