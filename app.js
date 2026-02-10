@@ -6,7 +6,13 @@ const mainRouter = require("./routes/index");
 
 const app = express();
 
-app.use(cors("*"));
+app.use(
+  cors({
+    origin: ["http://18.222.217.216", "http://18.222.217.216:80"],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  }),
+);
 app.use(express.json());
 
 const { MONGODB_URI = "mongodb://127.0.0.1:27017/wtwr_db" } = process.env;
