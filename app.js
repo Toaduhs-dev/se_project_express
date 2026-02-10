@@ -6,13 +6,42 @@ const mainRouter = require("./routes/index");
 
 const app = express();
 
-app.use(
-  cors({
-    origin: ["http://18.222.217.216", "http://18.222.217.216:80"],
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true,
-  }),
-);
+const allowedOrigins = [
+  "http://18.222.217.216", // without trailing slash (common referrer)
+  "http://18.222.217.216/", // with trailing slash (if your code uses it)
+  "http://localhost:3000", // if your local frontend runs on 3000
+  "http://localhost:5173", // common for Vite/React dev
+  // 'https://yourdomain.com',      // add later for prod domain
+  // 'https://www.yourdomain.com',
+];
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    // Allow requests with no Origin header (e.g., mobile apps, curl, Postman)
+    if (!origin) return callback(null, true);
+
+    // Check if the requesting origin is in our allow list
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true); // Reflects the exact origin back
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Explicitly include OPTIONS for preflight
+  allowedHeaders: [
+    "Content-Type",
+    "Authorization",
+    "Accept",
+    "Origin",
+    "X-Requested-With",
+  ],
+  exposedHeaders: ["Content-Range", "X-Total-Count"], // Optional: if your API exposes custom headers
+  credentials: true, // Allows cookies, auth headers, etc.
+  optionsSuccessStatus: 200, // Some browsers/legacy clients prefer 200 over 204 for OPTIONS
+  maxAge: 86400, // Cache preflight responses for 24 hours (optional, good for performance)
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 const { MONGODB_URI = "mongodb://127.0.0.1:27017/wtwr_db" } = process.env;
