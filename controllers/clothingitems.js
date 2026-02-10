@@ -7,7 +7,6 @@ const {
   FORBIDDEN_ERROR_CODE,
 } = require("../utils/errors");
 
-// GET /items
 const getClothingItems = (req, res) => {
   ClothingItem.find({})
     .then((items) => res.send(items))
@@ -19,7 +18,6 @@ const getClothingItems = (req, res) => {
     });
 };
 
-// POST /items
 const createClothingItem = (req, res) => {
   console.log(req.user);
   const owner = req.user._id;
@@ -47,7 +45,6 @@ const createClothingItem = (req, res) => {
     });
 };
 
-// DELETE /items/:id
 const deleteClothingItem = (req, res) => {
   const { id } = req.params;
   ClothingItem.findById(id)
@@ -63,7 +60,7 @@ const deleteClothingItem = (req, res) => {
         throw err;
       }
       return ClothingItem.deleteOne({ _id: id }).then(() =>
-        res.send({ message: "Item deleted successfully" })
+        res.send({ message: "Item deleted successfully" }),
       );
     })
     .catch((err) => {
@@ -92,7 +89,7 @@ const updateLike = (req, res, method) => {
   ClothingItem.findByIdAndUpdate(
     id,
     { [method]: { likes: req.user._id } },
-    { new: true }
+    { new: true },
   )
     .orFail(() => {
       const error = new Error("Item ID not found");
@@ -117,10 +114,8 @@ const updateLike = (req, res, method) => {
     });
 };
 
-// PUT /items/:id/likes
 const likeClothingItem = (req, res) => updateLike(req, res, "$addToSet");
 
-// DELETE /items/:id/likes
 const dislikeClothingItem = (req, res) => updateLike(req, res, "$pull");
 
 module.exports = {

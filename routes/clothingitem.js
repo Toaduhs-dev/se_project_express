@@ -10,9 +10,9 @@ const {
 } = require("../controllers/clothingitems");
 
 router.get("/", getClothingItems);
-router.post("/", auth, createClothingItem); //add token
-router.delete("/:id", auth, deleteClothingItem); //add token
-router.put("/:id/likes", auth, likeClothingItem); //add token
-router.delete("/:id/likes", auth, dislikeClothingItem); // add token
+router.post("/", auth, createClothingItem);
+router.delete("/:id", auth, deleteClothingItem);
+router.put("/:id/likes", auth, likeClothingItem);
+router.delete("/:id/likes", auth, dislikeClothingItem);
 
 module.exports = router;
