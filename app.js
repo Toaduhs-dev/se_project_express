@@ -7,12 +7,12 @@ const mainRouter = require("./routes/index");
 const app = express();
 
 const allowedOrigins = [
-  "http://18.222.217.216", // without trailing slash (common referrer)
+  "http://18.222.217.216:80", // without trailing slash (common referrer)
   "http://18.222.217.216/", // with trailing slash (if your code uses it)
   "http://localhost:3000", // if your local frontend runs on 3000
   "http://localhost:5173", // common for Vite/React dev
-  // 'https://yourdomain.com',      // add later for prod domain
-  // 'https://www.yourdomain.com',
+  "http://localhost:80",
+  "http://localhost",
 ];
 
 const corsOptions = {
