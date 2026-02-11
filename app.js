@@ -15,33 +15,7 @@ const allowedOrigins = [
   "http://localhost",
 ];
 
-const corsOptions = {
-  origin: (origin, callback) => {
-    // Allow requests with no Origin header (e.g., mobile apps, curl, Postman)
-    if (!origin) return callback(null, true);
-
-    // Check if the requesting origin is in our allow list
-    if (allowedOrigins.includes(origin)) {
-      callback(null, true); // Reflects the exact origin back
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Explicitly include OPTIONS for preflight
-  allowedHeaders: [
-    "Content-Type",
-    "Authorization",
-    "Accept",
-    "Origin",
-    "X-Requested-With",
-  ],
-  exposedHeaders: ["Content-Range", "X-Total-Count"], // Optional: if your API exposes custom headers
-  credentials: true, // Allows cookies, auth headers, etc.
-  optionsSuccessStatus: 200, // Some browsers/legacy clients prefer 200 over 204 for OPTIONS
-  maxAge: 86400, // Cache preflight responses for 24 hours (optional, good for performance)
-};
-
-app.use(cors(corsOptions));
+app.use(cors());
 app.use(express.json());
 
 const { MONGODB_URI = "mongodb://127.0.0.1:27017/wtwr_db" } = process.env;
