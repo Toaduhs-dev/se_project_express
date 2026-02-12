@@ -7,15 +7,21 @@ const mainRouter = require("./routes/index");
 const app = express();
 
 const allowedOrigins = [
-  "http://18.222.217.216:80", // without trailing slash (common referrer)
-  "http://18.222.217.216/", // with trailing slash (if your code uses it)
-  "http://localhost:3000", // if your local frontend runs on 3000
-  "http://localhost:5173", // common for Vite/React dev
+  "http://18.222.217.216:80",
+  "http://18.222.217.216/",
+  "http://localhost:3000",
+  "http://localhost:5173",
   "http://localhost:80",
   "http://localhost",
 ];
 
-app.use(cors("*"));
+app.use(
+  cors({
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  }),
+);
 app.use(express.json());
 
 const { MONGODB_URI = "mongodb://127.0.0.1:27017/wtwr_db" } = process.env;
